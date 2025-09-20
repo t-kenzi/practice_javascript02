@@ -9,25 +9,45 @@
     <h1>天気予報</h1>
     <button id="loadWeathers">天気予報を取得</button>
     <ul id="weatherList"></ul>
+
+    <script>
+      const url =
+        "https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json";
+      const btn = document.getElementById("loadWeathers");
+      const weatherList = document.getElementById("weatherList");
+
+      btn.addEventListener("click", async () => {
+        weatherList.innerHTML = "<li>読み込み中...</li>";
+
+        try {
+          const res = await fetch(url, { cache: "no-store" });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const data = await res.json();
+
+          // JMAのJSON構造に合わせて抽出
+          // 例: data[0].timeSeries[0].areas[0].area.name / .weathers[0]
+          const ts = data?.[0]?.timeSeries?.[0];
+          const area0 = ts?.areas?.[0];
+          const areaName = area0?.area?.name ?? "地域名不明";
+          const todayWeather = area0?.weathers?.[0] ?? "不明";
+
+          weatherList.innerHTML = "";
+          const li = document.createElement("li");
+          li.className = "card";
+          li.innerHTML = `
+          <h2>${areaName}</h2>
+          <p>今日の天気：${todayWeather}</p>
+        `;
+          weatherList.appendChild(li);
+        } catch (e) {
+          weatherList.innerHTML = "";
+          const li = document.createElement("li");
+          li.textContent = `取得に失敗しました: ${e.message}`;
+          weatherList.appendChild(li);
+          // 開発時の詳細ログ
+          console.error(e);
+        }
+      });
+    </script>
   </body>
 </html>
-<script>
-  let url = "https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json";
-  document.getElementById("loadWeathers").addEventListener;
-  "click",
-    () => {
-      fetch(url)
-        .then((response) => response.json())
-        .then((weathers) => {
-          const weatherList = document.getElementById("weatherList");
-          weatherList.innerHTML = ""; // リストをクリア
-          const weatherItem = document.createElement("li");
-          weatherItem.className = "card";
-          weatherItem.innerHTML = `
-        <h2>${weatherItem.area[name]}</h2>
-        <p>今日の天気：${weatherItem.weathers}
-        `;
-          weatherList.appendChild(weatherItem);
-        });
-    };
-</script>
