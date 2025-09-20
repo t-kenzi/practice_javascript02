@@ -6,7 +6,28 @@
     <title>天気予報API</title>
   </head>
   <body>
-    <button>天気を取得</button>
-    <li></li>
+    <h1>天気予報</h1>
+    <button id="loadWeathers">天気予報を取得</button>
+    <ul id="weatherList"></ul>
   </body>
 </html>
+<script>
+  let url = "https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json";
+  document.getElementById("loadWeathers").addEventListener;
+  "click",
+    () => {
+      fetch(url)
+        .then((response) => response.json())
+        .then((weathers) => {
+          const weatherList = document.getElementById("weatherList");
+          weatherList.innerHTML = ""; // リストをクリア
+          const weatherItem = document.createElement("li");
+          weatherItem.className = "card";
+          weatherItem.innerHTML = `
+        <h2>${weatherItem.area[name]}</h2>
+        <p>今日の天気：${weatherItem.weathers}
+        `;
+          weatherList.appendChild(weatherItem);
+        });
+    };
+</script>
